@@ -1,5 +1,6 @@
 package com.anji.captcha.demo.controller;
 
+import com.anji.captcha.controller.CaptchaController;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;

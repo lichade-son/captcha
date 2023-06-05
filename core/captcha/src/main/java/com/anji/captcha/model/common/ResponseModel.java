@@ -6,7 +6,7 @@
  */
 package com.anji.captcha.model.common;
 
-import com.anji.captcha.util.StringUtils;
+import com.iquicker.framework.utils.StringUtils;
 
 import java.io.Serializable;
 
@@ -76,7 +76,7 @@ public class ResponseModel implements Serializable {
 	}
 
 	public boolean isSuccess(){
-        return StringUtils.equals(repCode, RepCodeEnum.SUCCESS.getCode());
+        return StringUtils.substringMatch(repCode, 0, RepCodeEnum.SUCCESS.getCode());
     }
 
     public String getRepCode() {

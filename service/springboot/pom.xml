@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.4.RELEASE</version>
+        <version>3.0.6</version>
     </parent>
 
     <groupId>com.anji.captcha</groupId>
@@ -20,8 +20,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <java.version>1.8</java.version>
-        <spring-boot-version>2.0.4.RELEASE</spring-boot-version>
+        <java.version>17</java.version>
+        <spring-boot-version>3.0.6</spring-boot-version>
         <skipTests>true</skipTests>
     </properties>
 

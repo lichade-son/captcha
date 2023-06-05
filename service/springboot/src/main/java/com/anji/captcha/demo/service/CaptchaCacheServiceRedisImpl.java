@@ -3,6 +3,7 @@ package com.anji.captcha.demo.service;
 import com.anji.captcha.service.CaptchaCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @author lide1202@hotmail.com
  * @date 2020-05-12
  */
+@Service
 public class CaptchaCacheServiceRedisImpl implements CaptchaCacheService {
 
     @Override

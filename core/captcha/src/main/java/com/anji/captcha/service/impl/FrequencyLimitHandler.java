@@ -5,7 +5,7 @@ import com.anji.captcha.model.common.RepCodeEnum;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaCacheService;
-import com.anji.captcha.util.StringUtils;
+import com.iquicker.framework.utils.StringUtils;
 
 import java.util.Objects;
 import java.util.Properties;
@@ -72,7 +72,7 @@ public interface FrequencyLimitHandler {
         @Override
         public ResponseModel validateGet(CaptchaVO d) {
         	// 无客户端身份标识，不限制
-        	if(StringUtils.isEmpty(d.getClientUid())){
+        	if(!StringUtils.hasLength(d.getClientUid())){
         		return null;
 			}
             String getKey = getClientCId(d, "GET");
@@ -111,7 +111,7 @@ public interface FrequencyLimitHandler {
         @Override
         public ResponseModel validateCheck(CaptchaVO d) {
 			// 无客户端身份标识，不限制
-			if(StringUtils.isEmpty(d.getClientUid())){
+			if(!StringUtils.hasLength(d.getClientUid())){
 				return null;
 			}
             /*String getKey = getClientCId(d, "GET");

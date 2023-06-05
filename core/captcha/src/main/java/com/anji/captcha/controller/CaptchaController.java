@@ -9,14 +9,13 @@ package com.anji.captcha.controller;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
-import com.anji.captcha.util.StringUtils;
+import com.iquicker.framework.utils.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 @RestController
@@ -48,16 +47,16 @@ public class CaptchaController {
         String xfwd = request.getHeader("X-Forwarded-For");
         String ip = getRemoteIpFromXfwd(xfwd);
         String ua = request.getHeader("user-agent");
-        if (StringUtils.isNotBlank(ip)) {
+        if (StringUtils.hasLength(ip)) {
             return ip + ua;
         }
         return request.getRemoteAddr() + ua;
     }
 
     private static String getRemoteIpFromXfwd(String xfwd) {
-        if (StringUtils.isNotBlank(xfwd)) {
+        if (StringUtils.hasLength(xfwd)) {
             String[] ipList = xfwd.split(",");
-            return StringUtils.trim(ipList[0]);
+            return StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(ipList[0], ' '), ' ');
         }
         return null;
     }

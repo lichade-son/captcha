@@ -164,6 +164,8 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
             int jigsawWidth = jigsawImage.getWidth();
             int jigsawHeight = jigsawImage.getHeight();
 
+            String imageToBase64Str = ImageUtils.getImageToBase64Str(originalImage);
+
             //随机生成拼图坐标
             PointVO point = generateJigsawPoint(originalWidth, originalHeight, jigsawWidth, jigsawHeight);
             int x = point.getX();
@@ -190,6 +192,7 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
                 while (true) {
                     String s = ImageUtils.getslidingBlock();
                     if (!jigsawImageBase64.equals(s)) {
+                        // 根据模板s透明化一块图像
                         interferenceByTemplate(originalImage, Objects.requireNonNull(ImageUtils.getBase64StrToImage(s)), position, 0);
                         break;
                     }

@@ -10,7 +10,7 @@ import com.anji.captcha.model.common.RepCodeEnum;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
-import com.anji.captcha.util.StringUtils;
+import com.iquicker.framework.utils.StringUtils;
 
 import java.util.Properties;
 
@@ -53,7 +53,7 @@ public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
         if (captchaVO == null) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
-        if (StringUtils.isEmpty(captchaVO.getCaptchaType())) {
+        if (!StringUtils.hasLength(captchaVO.getCaptchaType())) {
             return RepCodeEnum.NULL_ERROR.parseError("类型");
         }
         return getService(captchaVO.getCaptchaType()).get(captchaVO);
@@ -64,10 +64,10 @@ public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
         if (captchaVO == null) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
-        if (StringUtils.isEmpty(captchaVO.getCaptchaType())) {
+        if (!StringUtils.hasLength(captchaVO.getCaptchaType())) {
             return RepCodeEnum.NULL_ERROR.parseError("类型");
         }
-        if (StringUtils.isEmpty(captchaVO.getToken())) {
+        if (!StringUtils.hasLength(captchaVO.getToken())) {
             return RepCodeEnum.NULL_ERROR.parseError("token");
         }
         return getService(captchaVO.getCaptchaType()).check(captchaVO);
@@ -78,7 +78,7 @@ public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
         if (captchaVO == null) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
-        if (StringUtils.isEmpty(captchaVO.getCaptchaVerification())) {
+        if (!StringUtils.hasLength(captchaVO.getCaptchaVerification())) {
             return RepCodeEnum.NULL_ERROR.parseError("二次校验参数");
         }
         try {

@@ -6,7 +6,7 @@
  */
 package com.anji.captcha.model.common;
 
-import com.anji.captcha.util.StringUtils;
+import com.iquicker.framework.utils.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -49,7 +49,7 @@ public class RequestModel implements Serializable {
      * @return
      */
     public boolean isVaildateRequest() {
-        if (StringUtils.isBlank(sign) || StringUtils.isBlank(time)) {
+        if (StringUtils.hasLength(sign) || StringUtils.hasLength(time)) {
             return false;
         }
         return true;
