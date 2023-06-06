@@ -122,7 +122,7 @@ public abstract class AbstractCaptchaService implements CaptchaService {
     private static FrequencyLimitHandler limitHandler;
 
     @Override
-    public R<?> get(CaptchaVO captchaVO) {
+    public R<CaptchaVO> get(CaptchaVO captchaVO) {
         if (limitHandler != null) {
             captchaVO.setClientUid(getValidateClientId(captchaVO));
             return limitHandler.validateGet(captchaVO);
@@ -131,7 +131,7 @@ public abstract class AbstractCaptchaService implements CaptchaService {
     }
 
     @Override
-    public R check(CaptchaVO captchaVO) {
+    public R<?> check(CaptchaVO captchaVO) {
         if (limitHandler != null) {
             // 验证客户端
            /* ResponseModel ret = limitHandler.validateCheck(captchaVO);

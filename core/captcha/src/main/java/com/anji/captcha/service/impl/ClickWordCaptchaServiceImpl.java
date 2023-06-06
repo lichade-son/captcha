@@ -69,8 +69,8 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
     }
 
     @Override
-    public R get(CaptchaVO captchaVO) {
-        R r = super.get(captchaVO);
+    public R<CaptchaVO> get(CaptchaVO captchaVO) {
+        R<CaptchaVO> r = super.get(captchaVO);
         if (!validatedReq(r)) {
             return r;
         }

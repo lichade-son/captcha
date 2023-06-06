@@ -28,7 +28,7 @@ public class CaptchaController {
     }
 
     @PostMapping("/get")
-    public R<?> get(@RequestBody CaptchaVO data, HttpServletRequest request) {
+    public R<CaptchaVO> get(@RequestBody CaptchaVO data, HttpServletRequest request) {
         assert request.getRemoteHost()!=null;
         data.setBrowserInfo(getRemoteId(request));
         return captchaService.get(data);

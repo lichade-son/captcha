@@ -49,7 +49,7 @@ public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
     }
 
     @Override
-    public R<?> get(CaptchaVO captchaVO) {
+    public R<CaptchaVO> get(CaptchaVO captchaVO) {
         if (captchaVO == null) {
             throw new ServiceException("captchaVO是null");
 //            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");

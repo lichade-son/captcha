@@ -26,7 +26,7 @@ public interface FrequencyLimitHandler {
      * @param captchaVO
      * @return
      */
-    R<?> validateGet(CaptchaVO captchaVO);
+    R<CaptchaVO> validateGet(CaptchaVO captchaVO);
 
     /**
      * check接口限流
@@ -34,7 +34,7 @@ public interface FrequencyLimitHandler {
      * @param captchaVO
      * @return
      */
-    R validateCheck(CaptchaVO captchaVO);
+    R<?> validateCheck(CaptchaVO captchaVO);
 
     /**
      * verify接口限流
@@ -42,7 +42,7 @@ public interface FrequencyLimitHandler {
      * @param captchaVO
      * @return
      */
-    R validateVerify(CaptchaVO captchaVO);
+    R<?> validateVerify(CaptchaVO captchaVO);
 
 
     /***
@@ -72,7 +72,7 @@ public interface FrequencyLimitHandler {
         }
 
         @Override
-        public R<?> validateGet(CaptchaVO d) {
+        public R<CaptchaVO> validateGet(CaptchaVO d) {
         	// 无客户端身份标识，不限制
         	if(!StringUtils.hasLength(d.getClientUid())){
         		return null;

@@ -28,21 +28,21 @@ public interface CaptchaService {
      * @param captchaVO
      * @return
      */
-    R<?> get(CaptchaVO captchaVO);
+    R<CaptchaVO> get(CaptchaVO captchaVO);
 
     /**
      * 核对验证码(前端)
      * @param captchaVO
      * @return
      */
-    R check(CaptchaVO captchaVO);
+    R<?> check(CaptchaVO captchaVO);
 
     /**
      * 二次校验验证码(后端)
      * @param captchaVO
      * @return
      */
-    R verification(CaptchaVO captchaVO);
+    R<?> verification(CaptchaVO captchaVO);
 
     /***
      * 验证码类型

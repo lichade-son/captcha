@@ -86,7 +86,7 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
     }
 
     @Override
-    public R check(CaptchaVO captchaVO) {
+    public R<?> check(CaptchaVO captchaVO) {
 		R r = super.check(captchaVO);
 		if(!validatedReq(r)){
 			return r;
