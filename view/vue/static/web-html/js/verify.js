@@ -271,7 +271,7 @@
 				var captchaVerification = aesEncrypt(this.backToken+'---'+JSON.stringify({x:this.moveLeftDistance,y:5.0}))
 				checkPictrue(data,this.options.baseUrl).then(res=>{
 					// 请求反正成功的判断
-					if (res.repCode=="0000") {
+					if (res.code=="200") {
 						this.htmlDoms.move_block.css('background-color', '#5cb85c');
 						this.htmlDoms.left_bar.css({'border-color': '#5cb85c', 'background-color': '#fff'});
 						this.htmlDoms.icon.css('color', '#fff');
@@ -387,10 +387,10 @@
 			this.$element.find('.verify-msg:eq(0)').text(this.options.explain);
 			this.isEnd = false;
 			getPictrue({captchaType:"blockPuzzle"},this.options.baseUrl).then(res=>{
-				if (res.repCode=="0000") {
-					this.$element.find(".backImg")[0].src = 'data:image/png;base64,'+res.repData.originalImageBase64
-					this.$element.find(".bock-backImg")[0].src = 'data:image/png;base64,'+res.repData.jigsawImageBase64
-					this.backToken = res.repData.token
+				if (res.code=="200") {
+					this.$element.find(".backImg")[0].src = 'data:image/png;base64,'+res.data.originalImageBase64
+					this.$element.find(".bock-backImg")[0].src = 'data:image/png;base64,'+res.data.jigsawImageBase64
+					this.backToken = res.data.token
 				}
 			});
 			this.htmlDoms.sub_block.css('left', "0px");
@@ -471,7 +471,7 @@
 
 						var captchaVerification = aesEncrypt(_this.backToken+'---'+JSON.stringify(_this.checkPosArr))
 						checkPictrue(data,this.options.baseUrl).then(res=>{
-							if (res.repCode=="0000") {
+							if (res.code=="200") {
 								_this.$element.find('.verify-bar-area').css({'color': '#4cae4c', 'border-color': '#5cb85c'});
 								_this.$element.find('.verify-msg').text('验证成功');
 								_this.$element.find('.verify-refresh').hide();
@@ -595,10 +595,10 @@
         	this.checkPosArr = [];
         	this.num = 1;
 			getPictrue({captchaType:"clickWord"},this.options.baseUrl).then(res=>{
-				if (res.repCode=="0000") {
-					this.htmlDoms.back_img[0].src ='data:image/png;base64,'+ res.repData.originalImageBase64
-					this.backToken = res.repData.token
-					let text = '请依次点击【' + res.repData.wordList.join(",") + '】'
+				if (res.code=="200") {
+					this.htmlDoms.back_img[0].src ='data:image/png;base64,'+ res.data.originalImageBase64
+					this.backToken = res.data.token
+					let text = '请依次点击【' + res.data.wordList.join(",") + '】'
 					_this.$element.find('.verify-msg').text(text);
 				}
 			})

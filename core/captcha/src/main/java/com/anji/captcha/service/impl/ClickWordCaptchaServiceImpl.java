@@ -13,6 +13,7 @@ import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.model.vo.PointVO;
 import com.anji.captcha.util.*;
+import com.iquicker.framework.base.exception.ServiceException;
 import com.iquicker.framework.base.model.web.R;
 
 import java.awt.*;
@@ -44,46 +45,48 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         super.init(config);
         clickWordFontStr = config.getProperty(Const.CAPTCHA_FONT_TYPE, "SourceHanSansCN-Normal.otf");
         try {
-            int size = Integer.valueOf(config.getProperty(Const.CAPTCHA_FONT_SIZE,HAN_ZI_SIZE+""));
+            int size = Integer.parseInt(config.getProperty(Const.CAPTCHA_FONT_SIZE,HAN_ZI_SIZE+""));
 
             if (clickWordFontStr.toLowerCase().endsWith(".ttf")
                     || clickWordFontStr.toLowerCase().endsWith(".ttc")
                     || clickWordFontStr.toLowerCase().endsWith(".otf")) {
                 this.clickWordFont = Font.createFont(Font.TRUETYPE_FONT,
-                        getClass().getResourceAsStream("/fonts/" + clickWordFontStr))
+                                Objects.requireNonNull(getClass().getResourceAsStream("/fonts/" + clickWordFontStr)))
                         .deriveFont(Font.BOLD, size);
             } else {
-                int style = Integer.valueOf(config.getProperty(Const.CAPTCHA_FONT_STYLE,Font.BOLD+""));
+                int style = Integer.parseInt(config.getProperty(Const.CAPTCHA_FONT_STYLE,Font.BOLD+""));
                 this.clickWordFont = new Font(clickWordFontStr, style, size);
             }
         } catch (Exception ex) {
-            logger.error("load font error:{}", ex);
+            logger.error("load font error:", ex);
         }
-        this.wordTotalCount = Integer.valueOf(config.getProperty(Const.CAPTCHA_WORD_COUNT,"4"));
+        this.wordTotalCount = Integer.parseInt(config.getProperty(Const.CAPTCHA_WORD_COUNT,"4"));
     }
 
     @Override
     public void destroy(Properties config) {
-        logger.info("start-clear-history-data-", captchaType());
+        logger.info("start-clear-history-data-"+captchaType());
     }
 
     @Override
-    public ResponseModel get(CaptchaVO captchaVO) {
-        ResponseModel r = super.get(captchaVO);
+    public R get(CaptchaVO captchaVO) {
+        R r = super.get(captchaVO);
         if (!validatedReq(r)) {
             return r;
         }
         BufferedImage bufferedImage = ImageUtils.getPicClick();
         if (null == bufferedImage) {
             logger.error("滑动底图未初始化成功，请检查路径");
-            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_BASEMAP_NULL);
+            throw new ServiceException("滑动底图未初始化成功，请检查路径");
+//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_BASEMAP_NULL);
         }
         CaptchaVO imageData = getImageData(bufferedImage);
         if (imageData == null
                 || StringUtils.isBlank(imageData.getOriginalImageBase64())) {
-            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_ERROR);
+            throw new ServiceException("获取验证码失败,请联系管理员");
+//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_ERROR);
         }
-        return ResponseModel.successData(imageData);
+        return R.success(imageData);
     }
 
     @Override
@@ -95,7 +98,8 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         //取坐标信息
         String codeKey = String.format(REDIS_CAPTCHA_KEY, captchaVO.getToken());
         if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
-            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
+            throw new ServiceException("验证码已失效，请重新获取");
+//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
         }
         String s = CaptchaServiceFactory.getCache(cacheType).get(codeKey);
         //验证码只用一次，即刻失效
@@ -127,7 +131,8 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         } catch (Exception e) {
             logger.error("验证码坐标解析失败", e);
             afterValidateFail(captchaVO);
-            return ResponseModel.errorMsg(e.getMessage());
+            throw new ServiceException("验证码坐标解析失败", e);
+//            return ResponseModel.errorMsg(e.getMessage());
         }
         for (int i = 0; i < point.size(); i++) {
             if (point.get(i).x - HAN_ZI_SIZE > point1.get(i).x
@@ -135,7 +140,8 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
                     || point.get(i).y - HAN_ZI_SIZE > point1.get(i).y
                     || point1.get(i).y > point.get(i).y + HAN_ZI_SIZE) {
                 afterValidateFail(captchaVO);
-                return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_COORDINATE_ERROR);
+                throw new ServiceException("验证失败");
+//                return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_COORDINATE_ERROR);
             }
         }
         //校验成功，将信息存入缓存
@@ -146,13 +152,14 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         } catch (Exception e) {
             logger.error("AES加密失败", e);
             afterValidateFail(captchaVO);
-            return ResponseModel.errorMsg(e.getMessage());
+            throw new ServiceException("AES加密失败", e);
+//            return ResponseModel.errorMsg(e.getMessage());
         }
         String secondKey = String.format(REDIS_SECOND_CAPTCHA_KEY, value);
         CaptchaServiceFactory.getCache(cacheType).set(secondKey, captchaVO.getToken(), EXPIRESIN_THREE);
         captchaVO.setResult(true);
         captchaVO.resetClientFlag();
-        return ResponseModel.successData(captchaVO);
+        return R.success(captchaVO);
     }
 
     @Override
@@ -170,15 +177,17 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         try {
             String codeKey = String.format(REDIS_SECOND_CAPTCHA_KEY, captchaVO.getCaptchaVerification());
             if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
-                return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
+                throw new ServiceException("验证码已失效，请重新获取");
+//                return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
             }
             //二次校验取值后，即刻失效
             CaptchaServiceFactory.getCache(cacheType).delete(codeKey);
         } catch (Exception e) {
             logger.error("验证码坐标解析失败", e);
-            return ResponseModel.errorMsg(e.getMessage());
+            throw new ServiceException("验证码坐标解析失败", e);
+//            return ResponseModel.errorMsg(e.getMessage());
         }
-        return ResponseModel.success();
+        return R.success();
     }
 
     public int getWordTotalCount() {
@@ -209,7 +218,7 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
     private CaptchaVO getImageData(BufferedImage backgroundImage) {
         CaptchaVO dataVO = new CaptchaVO();
         List<String> wordList = new ArrayList<String>();
-        List<PointVO> pointList = new ArrayList();
+        List<PointVO> pointList = new ArrayList<>();
 
         Graphics backgroundGraphics = backgroundImage.getGraphics();
         int width = backgroundImage.getWidth();

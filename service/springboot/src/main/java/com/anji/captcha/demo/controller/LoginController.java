@@ -1,9 +1,8 @@
 package com.anji.captcha.demo.controller;
 
-import com.anji.captcha.controller.CaptchaController;
-import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
+import com.iquicker.framework.base.model.web.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,10 +20,10 @@ public class LoginController {
     private CaptchaService captchaService;
 
     @PostMapping("/login")
-    public ResponseModel get(@RequestParam("captchaVerification") String captchaVerification) {
+    public R get(@RequestParam("captchaVerification") String captchaVerification) {
         CaptchaVO captchaVO = new CaptchaVO();
         captchaVO.setCaptchaVerification(captchaVerification);
-        ResponseModel response = captchaService.verification(captchaVO);
+        R response = captchaService.verification(captchaVO);
         if(response.isSuccess() == false){
             //验证码校验失败，返回信息告诉前端
             //repCode  0000  无异常，代表成功

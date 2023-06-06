@@ -176,7 +176,7 @@ export default {
             'token': this.backToken
           }
           reqCheck(data).then(res => {
-            if (res.repCode == '0000') {
+            if (res.code == '200') {
               this.barAreaColor = '#4cae4c'
               this.barAreaBorderColor = '#5cb85c'
               this.text = '验证成功'
@@ -237,18 +237,18 @@ export default {
         ts: Date.now(), // 现在的时间戳
       }
       reqGet(data).then(res => {
-        if (res.repCode == '0000') {
-          this.pointBackImgBase = res.repData.originalImageBase64
-          this.backToken = res.repData.token
-          this.secretKey = res.repData.secretKey
-          this.poinTextList = res.repData.wordList
+        if (res.code == '200') {
+          this.pointBackImgBase = res.data.originalImageBase64
+          this.backToken = res.data.token
+          this.secretKey = res.data.secretKey
+          this.poinTextList = res.data.wordList
           this.text = '请依次点击【' + this.poinTextList.join(',') + '】'
         } else {
           this.text = res.repMsg
         }
 
         // 判断接口请求次数是否失效
-        if (res.repCode == '6201') {
+        if (res.code == '6201') {
           this.pointBackImgBase = null
         }
       })

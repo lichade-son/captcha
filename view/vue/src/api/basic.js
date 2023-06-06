@@ -83,9 +83,9 @@ export function loadOption(data1) {
     method: 'post',
     data: data
   }).then(res => {
-    return res.repData
+    return res.data
   }).catch(error => {
-    self.msgError(error.repMsg)
+    self.msgError(error.msg)
   })
 }
 
