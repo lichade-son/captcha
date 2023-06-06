@@ -5,9 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.6</version>
+        <groupId>com.iquicker.boot</groupId>
+        <artifactId>iquicker-boot-starter-parent</artifactId>
+        <version>0.0.5.RELEASE-SNAPSHOT</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>com.anji-plus</groupId>
@@ -33,16 +34,16 @@
             <version>1.7.25</version>
             <scope>provided</scope>
         </dependency>
+
+        <!--iquicker依赖-->
         <dependency>
             <groupId>com.iquicker.framework</groupId>
             <artifactId>iquicker-framework-utils</artifactId>
-            <version>0.0.5.RELEASE-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <scope>provided</scope>
+            <groupId>com.iquicker.boot</groupId>
+            <artifactId>iquicker-boot-starter-web</artifactId>
         </dependency>
     </dependencies>
 

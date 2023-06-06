@@ -5,6 +5,8 @@ import com.anji.captcha.model.common.RepCodeEnum;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaCacheService;
+import com.iquicker.framework.base.exception.ServiceException;
+import com.iquicker.framework.base.model.web.R;
 import com.iquicker.framework.utils.StringUtils;
 
 import java.util.Objects;
@@ -24,7 +26,7 @@ public interface FrequencyLimitHandler {
      * @param captchaVO
      * @return
      */
-    ResponseModel validateGet(CaptchaVO captchaVO);
+    R<?> validateGet(CaptchaVO captchaVO);
 
     /**
      * check接口限流
@@ -32,7 +34,7 @@ public interface FrequencyLimitHandler {
      * @param captchaVO
      * @return
      */
-    ResponseModel validateCheck(CaptchaVO captchaVO);
+    R validateCheck(CaptchaVO captchaVO);
 
     /**
      * verify接口限流
@@ -40,7 +42,7 @@ public interface FrequencyLimitHandler {
      * @param captchaVO
      * @return
      */
-    ResponseModel validateVerify(CaptchaVO captchaVO);
+    R validateVerify(CaptchaVO captchaVO);
 
 
     /***
@@ -57,8 +59,8 @@ public interface FrequencyLimitHandler {
      *   1分钟内不超过600次
      */
     class DefaultLimitHandler implements FrequencyLimitHandler {
-        private Properties config;
-        private CaptchaCacheService cacheService;
+        private final Properties config;
+        private final CaptchaCacheService cacheService;
 
         public DefaultLimitHandler(Properties config, CaptchaCacheService cacheService) {
             this.config = config;
@@ -70,7 +72,7 @@ public interface FrequencyLimitHandler {
         }
 
         @Override
-        public ResponseModel validateGet(CaptchaVO d) {
+        public R<?> validateGet(CaptchaVO d) {
         	// 无客户端身份标识，不限制
         	if(!StringUtils.hasLength(d.getClientUid())){
         		return null;
@@ -79,7 +81,8 @@ public interface FrequencyLimitHandler {
             String lockKey = getClientCId(d, "LOCK");
             // 失败次数过多，锁定
             if (Objects.nonNull(cacheService.get(lockKey))) {
-                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LOCK_GET_ERROR);
+                throw new ServiceException("接口验证失败数过多，请稍后再试");
+//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LOCK_GET_ERROR);
             }
             String getCnts = cacheService.get(getKey);
             if (Objects.isNull(getCnts)) {
@@ -88,8 +91,9 @@ public interface FrequencyLimitHandler {
             }
             cacheService.increment(getKey, 1);
             // 1分钟内请求次数过多
-            if (Long.valueOf(getCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_MINUTE_LIMIT, "120"))) {
-                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_GET_ERROR);
+            if (Long.parseLong(getCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_MINUTE_LIMIT, "120"))) {
+                throw new ServiceException("get接口请求次数超限，请稍后再试!");
+//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_GET_ERROR);
             }
 
             // 失败次数验证
@@ -100,16 +104,17 @@ public interface FrequencyLimitHandler {
                 return null;
             }
             // 1分钟内失败5次
-            if (Long.valueOf(failCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_LOCK_LIMIT, "5"))) {
+            if (Long.parseLong(failCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_LOCK_LIMIT, "5"))) {
                 // get接口锁定5分钟
-                cacheService.set(lockKey, "1", Long.valueOf(config.getProperty(Const.REQ_GET_LOCK_SECONDS, "300")));
-                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LOCK_GET_ERROR);
+                cacheService.set(lockKey, "1", Long.parseLong(config.getProperty(Const.REQ_GET_LOCK_SECONDS, "300")));
+                throw new ServiceException("接口验证失败数过多，请稍后再试!");
+//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LOCK_GET_ERROR);
             }
             return null;
         }
 
         @Override
-        public ResponseModel validateCheck(CaptchaVO d) {
+        public R validateCheck(CaptchaVO d) {
 			// 无客户端身份标识，不限制
 			if(!StringUtils.hasLength(d.getClientUid())){
 				return null;
@@ -125,14 +130,15 @@ public interface FrequencyLimitHandler {
                 v = "1";
             }
             cacheService.increment(key, 1);
-            if (Long.valueOf(v) > Long.valueOf(config.getProperty(Const.REQ_CHECK_MINUTE_LIMIT, "600"))) {
-                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_CHECK_ERROR);
+            if (Long.parseLong(v) > Long.parseLong(config.getProperty(Const.REQ_CHECK_MINUTE_LIMIT, "600"))) {
+                throw new ServiceException("check接口请求次数超限，请稍后再试!");
+//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_CHECK_ERROR);
             }
             return null;
         }
 
         @Override
-        public ResponseModel validateVerify(CaptchaVO d) {
+        public R validateVerify(CaptchaVO d) {
             /*String getKey = getClientCId(d, "GET");
             if(Objects.isNull(cacheService.get(getKey))){
                 return ResponseModel.errorMsg(RepCodeEnum.API_REQ_INVALID);
@@ -144,8 +150,9 @@ public interface FrequencyLimitHandler {
                 v = "1";
             }
             cacheService.increment(key, 1);
-            if (Long.valueOf(v) > Long.valueOf(config.getProperty(Const.REQ_VALIDATE_MINUTE_LIMIT, "600"))) {
-                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_VERIFY_ERROR);
+            if (Long.parseLong(v) > Long.parseLong(config.getProperty(Const.REQ_VALIDATE_MINUTE_LIMIT, "600"))) {
+                throw new ServiceException("verify请求次数超限!");
+//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_VERIFY_ERROR);
             }
             return null;
         }

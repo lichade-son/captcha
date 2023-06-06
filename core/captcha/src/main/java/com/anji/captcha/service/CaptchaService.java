@@ -8,6 +8,7 @@ package com.anji.captcha.service;
 
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
+import com.iquicker.framework.base.model.web.R;
 
 import java.util.Properties;
 
@@ -27,21 +28,21 @@ public interface CaptchaService {
      * @param captchaVO
      * @return
      */
-    ResponseModel get(CaptchaVO captchaVO);
+    R<?> get(CaptchaVO captchaVO);
 
     /**
      * 核对验证码(前端)
      * @param captchaVO
      * @return
      */
-    ResponseModel check(CaptchaVO captchaVO);
+    R check(CaptchaVO captchaVO);
 
     /**
      * 二次校验验证码(后端)
      * @param captchaVO
      * @return
      */
-    ResponseModel verification(CaptchaVO captchaVO);
+    R verification(CaptchaVO captchaVO);
 
     /***
      * 验证码类型

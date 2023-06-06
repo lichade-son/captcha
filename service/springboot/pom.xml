@@ -5,9 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.6</version>
+        <groupId>com.iquicker.boot</groupId>
+        <artifactId>iquicker-boot-starter-parent</artifactId>
+        <version>0.0.5.RELEASE-SNAPSHOT</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>com.anji.captcha</groupId>
@@ -37,10 +38,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
-
+        <!--iquicker依赖-->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>com.iquicker.boot</groupId>
+            <artifactId>iquicker-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>

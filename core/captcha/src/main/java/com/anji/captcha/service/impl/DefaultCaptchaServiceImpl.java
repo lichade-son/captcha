@@ -6,10 +6,10 @@
  */
 package com.anji.captcha.service.impl;
 
-import com.anji.captcha.model.common.RepCodeEnum;
-import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
+import com.iquicker.framework.base.exception.ServiceException;
+import com.iquicker.framework.base.model.web.R;
 import com.iquicker.framework.utils.StringUtils;
 
 import java.util.Properties;
@@ -49,50 +49,59 @@ public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
     }
 
     @Override
-    public ResponseModel get(CaptchaVO captchaVO) {
+    public R<?> get(CaptchaVO captchaVO) {
         if (captchaVO == null) {
-            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
+            throw new ServiceException("captchaVO是null");
+//            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
         if (!StringUtils.hasLength(captchaVO.getCaptchaType())) {
-            return RepCodeEnum.NULL_ERROR.parseError("类型");
+            throw new ServiceException("CaptchaType为空");
+//            return RepCodeEnum.NULL_ERROR.parseError("类型");
         }
         return getService(captchaVO.getCaptchaType()).get(captchaVO);
     }
 
     @Override
-    public ResponseModel check(CaptchaVO captchaVO) {
+    public R check(CaptchaVO captchaVO) {
         if (captchaVO == null) {
-            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
+            throw new ServiceException("captchaVO是null");
+//            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
         if (!StringUtils.hasLength(captchaVO.getCaptchaType())) {
-            return RepCodeEnum.NULL_ERROR.parseError("类型");
+            throw new ServiceException("CaptchaType为空");
+//            return RepCodeEnum.NULL_ERROR.parseError("类型");
         }
         if (!StringUtils.hasLength(captchaVO.getToken())) {
-            return RepCodeEnum.NULL_ERROR.parseError("token");
+            throw new ServiceException("token");
+//            return RepCodeEnum.NULL_ERROR.parseError("token");
         }
         return getService(captchaVO.getCaptchaType()).check(captchaVO);
     }
 
     @Override
-    public ResponseModel verification(CaptchaVO captchaVO) {
+    public R verification(CaptchaVO captchaVO) {
         if (captchaVO == null) {
-            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
+            throw new ServiceException("captchaVO是null");
+//            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
         if (!StringUtils.hasLength(captchaVO.getCaptchaVerification())) {
-            return RepCodeEnum.NULL_ERROR.parseError("二次校验参数");
+            throw new ServiceException("二次校验参数是null");
+//            return RepCodeEnum.NULL_ERROR.parseError("二次校验参数");
         }
         try {
             String codeKey = String.format(REDIS_SECOND_CAPTCHA_KEY, captchaVO.getCaptchaVerification());
             if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
-                return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
+                throw new ServiceException("验证码已失效，请重新获取");
+//                return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
             }
             //二次校验取值后，即刻失效
             CaptchaServiceFactory.getCache(cacheType).delete(codeKey);
         } catch (Exception e) {
             logger.error("验证码坐标解析失败", e);
-            return ResponseModel.errorMsg(e.getMessage());
+            throw new ServiceException("验证码坐标解析失败", e);
+//            return ResponseModel.errorMsg(e.getMessage());
         }
-        return ResponseModel.success();
+        return R.success();
     }
 
 }

@@ -5,6 +5,7 @@ import com.anji.captcha.model.common.CaptchaTypeEnum;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
+import com.iquicker.framework.base.model.web.R;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -71,8 +72,8 @@ public class FrequencyLimitTest {
     public void testGet() throws Exception {
         int i = 0;
         while (i++ < cnt) {
-            ResponseModel res = captchaService.get(req);
-            logger.info(i + "=" + res.getRepCode() + "," + res.getRepMsg());
+            R res = captchaService.get(req);
+            logger.info(i + "=" + res.getCode() + "," + res.getMsg());
             TimeUnit.SECONDS.sleep(1);
         }
 
@@ -85,8 +86,8 @@ public class FrequencyLimitTest {
         int i = 0;
         while (i++ < cnt) {
             req.setToken("xddfdf"+i);
-            ResponseModel res = captchaService.check(req);
-            logger.info(i + "=" + res.getRepCode() + "," + res.getRepMsg());
+            R res = captchaService.check(req);
+            logger.info(i + "=" + res.getCode() + "," + res.getMsg());
             TimeUnit.SECONDS.sleep(1);
         }
     }
@@ -97,8 +98,8 @@ public class FrequencyLimitTest {
         while (i++ < cnt) {
             req.setToken("xddfdf"+i);
             req.setCaptchaVerification("sdfddfdd");
-            ResponseModel res = captchaService.verification(req);
-            logger.info(i + "=" + res.getRepCode() + "," + res.getRepMsg());
+            R res = captchaService.verification(req);
+            logger.info(i + "=" + res.getMsg() + "," + res.getCode());
             //TimeUnit.SECONDS.sleep(1);
         }
     }

@@ -7,12 +7,12 @@
 package com.anji.captcha.service.impl;
 
 import com.anji.captcha.model.common.Const;
-import com.anji.captcha.model.common.RepCodeEnum;
-import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaCacheService;
 import com.anji.captcha.service.CaptchaService;
 import com.anji.captcha.util.*;
+import com.iquicker.framework.base.exception.ServiceException;
+import com.iquicker.framework.base.model.web.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +122,7 @@ public abstract class AbstractCaptchaService implements CaptchaService {
     private static FrequencyLimitHandler limitHandler;
 
     @Override
-    public ResponseModel get(CaptchaVO captchaVO) {
+    public R<?> get(CaptchaVO captchaVO) {
         if (limitHandler != null) {
             captchaVO.setClientUid(getValidateClientId(captchaVO));
             return limitHandler.validateGet(captchaVO);
@@ -131,7 +131,7 @@ public abstract class AbstractCaptchaService implements CaptchaService {
     }
 
     @Override
-    public ResponseModel check(CaptchaVO captchaVO) {
+    public R check(CaptchaVO captchaVO) {
         if (limitHandler != null) {
             // 验证客户端
            /* ResponseModel ret = limitHandler.validateCheck(captchaVO);
@@ -146,12 +146,14 @@ public abstract class AbstractCaptchaService implements CaptchaService {
     }
 
     @Override
-    public ResponseModel verification(CaptchaVO captchaVO) {
+    public R verification(CaptchaVO captchaVO) {
         if (captchaVO == null) {
-            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
+            throw new ServiceException("captchaVO是null");
+//            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
         if (StringUtils.isEmpty(captchaVO.getCaptchaVerification())) {
-            return RepCodeEnum.NULL_ERROR.parseError("captchaVerification");
+            throw new ServiceException("captchaVerification是null");
+//            return RepCodeEnum.NULL_ERROR.parseError("captchaVerification");
         }
         if (limitHandler != null) {
             return limitHandler.validateVerify(captchaVO);
@@ -159,7 +161,7 @@ public abstract class AbstractCaptchaService implements CaptchaService {
         return null;
     }
 
-    protected boolean validatedReq(ResponseModel resp) {
+    protected boolean validatedReq(R resp) {
         return resp == null || resp.isSuccess();
     }
 

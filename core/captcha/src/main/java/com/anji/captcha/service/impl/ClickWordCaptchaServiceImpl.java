@@ -13,6 +13,7 @@ import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.model.vo.PointVO;
 import com.anji.captcha.util.*;
+import com.iquicker.framework.base.model.web.R;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -86,8 +87,8 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
     }
 
     @Override
-    public ResponseModel check(CaptchaVO captchaVO) {
-        ResponseModel r = super.check(captchaVO);
+    public R check(CaptchaVO captchaVO) {
+        R r = super.check(captchaVO);
         if (!validatedReq(r)) {
             return r;
         }
@@ -155,14 +156,14 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
     }
 
     @Override
-    public ResponseModel verification(CaptchaVO captchaVO) {
+    public R verification(CaptchaVO captchaVO) {
         /*if (captchaVO == null) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
         if (StringUtils.isEmpty(captchaVO.getCaptchaVerification())) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVerification");
         }*/
-        ResponseModel r = super.verification(captchaVO);
+        R r = super.verification(captchaVO);
         if (!validatedReq(r)) {
             return r;
         }
