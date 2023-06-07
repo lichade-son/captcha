@@ -6,7 +6,6 @@
  */
 package com.anji.captcha.service;
 
-import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.iquicker.framework.base.model.web.R;
 
