@@ -12,6 +12,7 @@ import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.model.vo.PointVO;
 import com.anji.captcha.util.*;
+import com.iquicker.framework.base.constants.StatusConstant;
 import com.iquicker.framework.base.exception.ServiceException;
 import com.iquicker.framework.base.model.web.R;
 
@@ -56,8 +57,8 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
         BufferedImage originalImage = ImageUtils.getOriginal();
         if (null == originalImage) {
             logger.error("滑动底图未初始化成功，请检查路径");
-            throw new ServiceException("滑动底图未初始化成功，请检查路径");
-//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_BASEMAP_NULL);
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "滑动底图未初始化成功，请检查路径");
+
         }
         //设置水印
         Graphics backgroundGraphics = originalImage.getGraphics();
@@ -72,15 +73,15 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
         BufferedImage jigsawImage = ImageUtils.getBase64StrToImage(jigsawImageBase64);
         if (null == jigsawImage) {
             logger.error("滑动底图未初始化成功，请检查路径");
-            throw new ServiceException("滑动底图未初始化成功，请检查路径");
-//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_BASEMAP_NULL);
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "滑动底图未初始化成功，请检查路径");
+
         }
         CaptchaVO captcha = pictureTemplatesCut(originalImage, jigsawImage, jigsawImageBase64);
         if (captcha == null
                 || StringUtils.isBlank(captcha.getJigsawImageBase64())
                 || StringUtils.isBlank(captcha.getOriginalImageBase64())) {
-            throw new ServiceException("获取验证码失败,请联系管理员");
-//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_ERROR);
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "获取验证码失败,请联系管理员");
+
         }
         return R.success(captcha);
     }
@@ -94,8 +95,8 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
         //取坐标信息
         String codeKey = String.format(REDIS_CAPTCHA_KEY, captchaVO.getToken());
         if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
-            throw new ServiceException("验证码已失效，请重新获取");
-//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证码已失效，请重新获取");
+
         }
         String s = CaptchaServiceFactory.getCache(cacheType).get(codeKey);
         //验证码只用一次，即刻失效
@@ -111,15 +112,15 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
         } catch (Exception e) {
             logger.error("验证码坐标解析失败", e);
             afterValidateFail(captchaVO);
-            throw new ServiceException("验证码坐标解析失败", e);
-//            return ResponseModel.errorMsg(e.getMessage());
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证码坐标解析失败");
+
         }
         if (point.x - Integer.parseInt(slipOffset) > point1.x
                 || point1.x > point.x + Integer.parseInt(slipOffset)
                 || point.y != point1.y) {
             afterValidateFail(captchaVO);
-            throw new ServiceException("验证失败");
-//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_COORDINATE_ERROR);
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证失败");
+
         }
         //校验成功，将信息存入缓存
         String secretKey = point.getSecretKey();
@@ -129,8 +130,8 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
         } catch (Exception e) {
             logger.error("AES加密失败", e);
             afterValidateFail(captchaVO);
-            throw new ServiceException("AES加密失败", e);
-//            return ResponseModel.errorMsg(e.getMessage());
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "AES加密失败");
+
         }
         String secondKey = String.format(REDIS_SECOND_CAPTCHA_KEY, value);
         CaptchaServiceFactory.getCache(cacheType).set(secondKey, captchaVO.getToken(), EXPIRESIN_THREE);
@@ -148,15 +149,14 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
         try {
             String codeKey = String.format(REDIS_SECOND_CAPTCHA_KEY, captchaVO.getCaptchaVerification());
             if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
-                throw new ServiceException("验证码已失效，请重新获取");
-//                return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
+                return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证码已失效，请重新获取");
+
             }
             //二次校验取值后，即刻失效
             CaptchaServiceFactory.getCache(cacheType).delete(codeKey);
         } catch (Exception e) {
             logger.error("验证码坐标解析失败", e);
-            throw new ServiceException("验证码坐标解析失败", e);
-//            return ResponseModel.errorMsg(e.getMessage());
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证码坐标解析失败");
         }
         return R.success();
     }

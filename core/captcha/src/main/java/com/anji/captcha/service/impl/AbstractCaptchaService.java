@@ -11,6 +11,7 @@ import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaCacheService;
 import com.anji.captcha.service.CaptchaService;
 import com.anji.captcha.util.*;
+import com.iquicker.framework.base.constants.StatusConstant;
 import com.iquicker.framework.base.exception.ServiceException;
 import com.iquicker.framework.base.model.web.R;
 import org.slf4j.Logger;
@@ -148,12 +149,11 @@ public abstract class AbstractCaptchaService implements CaptchaService {
     @Override
     public R verification(CaptchaVO captchaVO) {
         if (captchaVO == null) {
-            throw new ServiceException("captchaVO是null");
-//            return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
+            return R.error(StatusConstant.ErrorStatus.MISSING_ARGUMENT, "captchaVO是null");
         }
         if (StringUtils.isEmpty(captchaVO.getCaptchaVerification())) {
-            throw new ServiceException("captchaVerification是null");
-//            return RepCodeEnum.NULL_ERROR.parseError("captchaVerification");
+            return R.error(StatusConstant.ErrorStatus.MISSING_ARGUMENT, "captchaVerification是null");
+
         }
         if (limitHandler != null) {
             return limitHandler.validateVerify(captchaVO);

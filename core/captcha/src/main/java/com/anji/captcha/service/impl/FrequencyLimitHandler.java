@@ -5,6 +5,7 @@ import com.anji.captcha.model.common.RepCodeEnum;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaCacheService;
+import com.iquicker.framework.base.constants.StatusConstant;
 import com.iquicker.framework.base.exception.ServiceException;
 import com.iquicker.framework.base.model.web.R;
 import com.iquicker.framework.utils.StringUtils;
@@ -81,8 +82,7 @@ public interface FrequencyLimitHandler {
             String lockKey = getClientCId(d, "LOCK");
             // 失败次数过多，锁定
             if (Objects.nonNull(cacheService.get(lockKey))) {
-                throw new ServiceException("接口验证失败数过多，请稍后再试");
-//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LOCK_GET_ERROR);
+                return R.error(StatusConstant.ErrorStatus.TOO_MANY_REQUESTS, "接口验证失败数过多，请稍后再试");
             }
             String getCnts = cacheService.get(getKey);
             if (Objects.isNull(getCnts)) {
@@ -92,8 +92,7 @@ public interface FrequencyLimitHandler {
             cacheService.increment(getKey, 1);
             // 1分钟内请求次数过多
             if (Long.parseLong(getCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_MINUTE_LIMIT, "120"))) {
-                throw new ServiceException("get接口请求次数超限，请稍后再试!");
-//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_GET_ERROR);
+                return R.error(StatusConstant.ErrorStatus.TOO_MANY_REQUESTS, "get接口请求次数超限，请稍后再试!");
             }
 
             // 失败次数验证
@@ -107,8 +106,7 @@ public interface FrequencyLimitHandler {
             if (Long.parseLong(failCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_LOCK_LIMIT, "5"))) {
                 // get接口锁定5分钟
                 cacheService.set(lockKey, "1", Long.parseLong(config.getProperty(Const.REQ_GET_LOCK_SECONDS, "300")));
-                throw new ServiceException("接口验证失败数过多，请稍后再试!");
-//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LOCK_GET_ERROR);
+                return R.error(StatusConstant.ErrorStatus.TOO_MANY_REQUESTS, "接口验证失败数过多，请稍后再试");
             }
             return null;
         }
@@ -131,8 +129,7 @@ public interface FrequencyLimitHandler {
             }
             cacheService.increment(key, 1);
             if (Long.parseLong(v) > Long.parseLong(config.getProperty(Const.REQ_CHECK_MINUTE_LIMIT, "600"))) {
-                throw new ServiceException("check接口请求次数超限，请稍后再试!");
-//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_CHECK_ERROR);
+                return R.error(StatusConstant.ErrorStatus.TOO_MANY_REQUESTS, "check接口请求次数超限，请稍后再试!");
             }
             return null;
         }
@@ -151,8 +148,7 @@ public interface FrequencyLimitHandler {
             }
             cacheService.increment(key, 1);
             if (Long.parseLong(v) > Long.parseLong(config.getProperty(Const.REQ_VALIDATE_MINUTE_LIMIT, "600"))) {
-                throw new ServiceException("verify请求次数超限!");
-//                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_VERIFY_ERROR);
+                return R.error(StatusConstant.ErrorStatus.TOO_MANY_REQUESTS, "verify请求次数超限!");
             }
             return null;
         }

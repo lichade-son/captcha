@@ -13,6 +13,7 @@ import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.model.vo.PointVO;
 import com.anji.captcha.util.*;
+import com.iquicker.framework.base.constants.StatusConstant;
 import com.iquicker.framework.base.exception.ServiceException;
 import com.iquicker.framework.base.model.web.R;
 
@@ -77,14 +78,14 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         BufferedImage bufferedImage = ImageUtils.getPicClick();
         if (null == bufferedImage) {
             logger.error("滑动底图未初始化成功，请检查路径");
-            throw new ServiceException("滑动底图未初始化成功，请检查路径");
-//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_BASEMAP_NULL);
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "滑动底图未初始化成功，请检查路径");
+
+
         }
         CaptchaVO imageData = getImageData(bufferedImage);
         if (imageData == null
                 || StringUtils.isBlank(imageData.getOriginalImageBase64())) {
-            throw new ServiceException("获取验证码失败,请联系管理员");
-//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_ERROR);
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "获取验证码失败,请联系管理员");
         }
         return R.success(imageData);
     }
@@ -98,8 +99,7 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         //取坐标信息
         String codeKey = String.format(REDIS_CAPTCHA_KEY, captchaVO.getToken());
         if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
-            throw new ServiceException("验证码已失效，请重新获取");
-//            return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证码已失效，请重新获取");
         }
         String s = CaptchaServiceFactory.getCache(cacheType).get(codeKey);
         //验证码只用一次，即刻失效
@@ -131,8 +131,8 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         } catch (Exception e) {
             logger.error("验证码坐标解析失败", e);
             afterValidateFail(captchaVO);
-            throw new ServiceException("验证码坐标解析失败", e);
-//            return ResponseModel.errorMsg(e.getMessage());
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证码坐标解析失败");
+
         }
         for (int i = 0; i < point.size(); i++) {
             if (point.get(i).x - HAN_ZI_SIZE > point1.get(i).x
@@ -140,8 +140,8 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
                     || point.get(i).y - HAN_ZI_SIZE > point1.get(i).y
                     || point1.get(i).y > point.get(i).y + HAN_ZI_SIZE) {
                 afterValidateFail(captchaVO);
-                throw new ServiceException("验证失败");
-//                return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_COORDINATE_ERROR);
+                return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证失败");
+
             }
         }
         //校验成功，将信息存入缓存
@@ -152,8 +152,7 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         } catch (Exception e) {
             logger.error("AES加密失败", e);
             afterValidateFail(captchaVO);
-            throw new ServiceException("AES加密失败", e);
-//            return ResponseModel.errorMsg(e.getMessage());
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "AES加密失败");
         }
         String secondKey = String.format(REDIS_SECOND_CAPTCHA_KEY, value);
         CaptchaServiceFactory.getCache(cacheType).set(secondKey, captchaVO.getToken(), EXPIRESIN_THREE);
@@ -177,15 +176,15 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
         try {
             String codeKey = String.format(REDIS_SECOND_CAPTCHA_KEY, captchaVO.getCaptchaVerification());
             if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
-                throw new ServiceException("验证码已失效，请重新获取");
-//                return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
+                return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证码已失效，请重新获取");
+
             }
             //二次校验取值后，即刻失效
             CaptchaServiceFactory.getCache(cacheType).delete(codeKey);
         } catch (Exception e) {
             logger.error("验证码坐标解析失败", e);
-            throw new ServiceException("验证码坐标解析失败", e);
-//            return ResponseModel.errorMsg(e.getMessage());
+            return R.error(StatusConstant.ErrorStatus.SERVICE_EXCEPTION, "验证码坐标解析失败");
+
         }
         return R.success();
     }
